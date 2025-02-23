@@ -1,16 +1,16 @@
-import express from 'express';
-import axios from 'axios';
-import bodyParser from 'body-parser';
-import dotenv from 'dotenv';
-import AfricasTalking from 'africastalking';
+const express = require('express');
+const axios = require('axios');
+const bodyParser = require('body-parser');
+const dotenv = require('dotenv');
+const AfricasTalking = require('africastalking');
 
+dotenv.config();
 
 const africastalking = AfricasTalking({
   apiKey: process.env.AT_API_KEY,
   username: process.env.AT_USERNAME
 });
 
-dotenv.config();
 const app = express();
 const port = process.env.PORT || 3000;
 app.use(bodyParser.json());
@@ -35,7 +35,7 @@ app.get('/debts', (req, res) => {
 });
 
 // Function to generate AI-powered reminder using Granite
-async function generateReminderMessage(debtorName, debtAmount, dueDate) {
+async function generateReminder(debtorName, debtAmount, dueDate) {
   const graniteApiKey = process.env.GRANITE_API_KEY;
 
   const prompt = `Generate a polite yet firm debt reminder for ${debtorName}, who owes KES ${debtAmount} due on ${dueDate}. Keep it professional and encouraging.`;
