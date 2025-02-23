@@ -2,6 +2,7 @@ const express = require('express');
 const axios = require('axios');
 const bodyParser = require('body-parser');
 const dotenv = require('dotenv');
+const fs = require('fs');
 const AfricasTalking = require('africastalking');
 
 dotenv.config();
@@ -16,7 +17,22 @@ const port = process.env.PORT || 3000;
 app.use(bodyParser.json());
 
 // In-memory debt storage (replace with DB later)
-let debts = [];
+const DEBTS_FILE = "./debts.json";
+
+// Function to read debts from the file
+const readDebts = () => {
+  try {
+    const data = fs.readFileSync(DEBTS_FILE, "utf8");
+    return JSON.parse(data);
+  } catch (error) {
+    return []; // If file is empty or missing, return an empty array
+  }
+};
+
+// Function to write debts to the file
+const writeDebts = (debts) => {
+  fs.writeFileSync(DEBTS_FILE, JSON.stringify(debts, null, 2), "utf8");
+};
 
 // Route to add a new debt
 app.post('/add-debt', (req, res) => {
@@ -25,13 +41,18 @@ app.post('/add-debt', (req, res) => {
   if (!customer || !phone || !amount || !dueDate) {
     return res.status(400).json({ error: 'Missing required fields' });
   }
-  const debt = { id: debts.length + 1, customer, phone, amount, dueDate };
-  debts.push(debt);
-  res.json({ message: 'Debt added successfully', debt });
+
+  let debts = readDebts();
+
+  const newDebt = { id: debts.length + 1, customer, phone, amount, dueDate };
+  debts.push(newDebt);
+  writeDebts(debts);
+  res.status(201).json({ message: 'Debt added successfully', debt: newDebt })
 });
 
 // Route to fetch all debts
 app.get('/debts', (req, res) => {
+  const debts = readDebts()
   res.json(debts);
 });
 
@@ -73,7 +94,6 @@ async function sendSMS(phone, message) {
   } catch (ex) {
     console.error(ex);
   }
-
 }
 
 // Route to send reminders
