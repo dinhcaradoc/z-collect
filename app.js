@@ -18,6 +18,11 @@ app.use(bodyParser.json());
 // In-memory debt storage (replace with DB later)
 let debts = [];
 
+//Default route
+app.use('/', (req, res) => {
+  res.send("Welcome to Z-Collect. Let's make a difference!")
+})
+
 // Route to add a new debt
 app.post('/add-debt', (req, res) => {
   const { customer, phone, amount, dueDate } = req.body;
