@@ -18,14 +18,10 @@ app.use(bodyParser.json());
 // In-memory debt storage (replace with DB later)
 let debts = [];
 
-//Default route
-app.use('/', (req, res) => {
-  res.send("Welcome to Z-Collect. Let's make a difference!")
-})
-
 // Route to add a new debt
 app.post('/add-debt', (req, res) => {
   const { customer, phone, amount, dueDate } = req.body;
+  console.log(customer)
   if (!customer || !phone || !amount || !dueDate) {
     return res.status(400).json({ error: 'Missing required fields' });
   }
@@ -92,5 +88,10 @@ app.post('/send-reminders', async (req, res) => {
     res.status(500).json({ error: 'Error sending reminders', details: error.message });
   }
 });
+
+//Default route
+app.get('/', (req, res) => {
+  res.send("Welcome to Z-Collect. Let's make a difference!")
+})
 
 app.listen(port, () => console.log(`Server running on port ${port}`));
